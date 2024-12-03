@@ -71,8 +71,18 @@
             }
 
             .imgDish {
-                max-width: 250px;
-                margin-bottom: 20px;
+                width: 250px;             
+                height: 250px;            
+                object-fit: cover;        
+                margin: 0 auto;          
+                display: block; 
+                margin-bottom: 2vh;
+            }
+            
+            .modal {
+                margin-top: 35vh !important;
+                margin-left: 8vh !important;
+                display: none;
             }
         </style>
     </head>
@@ -125,139 +135,156 @@
                     }
                 }
             %>
-            <div class="d-flex justify-content-start align-items-center">
-                <div class="col-4 text-end mt-3">
-                    <p class="font">Nombre:</p>
+            <form action="${pageContext.request.contextPath}/editDish" method="post"> 
+                <div class="d-flex justify-content-start align-items-center">
+                    <div class="col-4 text-end mt-3">
+                        <p class="font">Nombre:</p>
+                    </div>
+                    <div class="col-4 ms-2">
+                        <input class="form-control" name="txt_nombre" id="txt_nombre" type="text" value="<%=nombre%>">
+                    </div>
                 </div>
-                <div class="col-4 ms-2">
-                    <input class="form-control" name="txt_nombre" id="txt_nombre" type="text" value="<%=nombre%>">
-                </div>
-            </div>
-            <div class="d-flex justify-content-start">
-                <div class="col-4 text-end">
-                    <p class="font">Imagen:</p>
-                </div>
-                <div class="col-4 ms-2">
-                    <div class="row">
-                        <div class="col-6">
-                            <img src="<%=imagen%>" class="imgDish" alt="Platillo"/>
-                        </div>
-                        <div class="col-6">
-                            <button type="file" id="txt_imagen" name="txt_imagen" class="btn btnUpdateImg">Actualizar Imagen <i class="bi bi-upload"></i>
-                            </button>
+                <div class="d-flex justify-content-start">
+                    <div class="col-4 text-end">
+                        <p class="font">Imagen:</p>
+                    </div>
+                    <div class="col-4 ms-2">
+                        <div class="row">
+                            <div class="col-6">
+                                <img src="<%=imagen%>" class="imgDish" alt="Platillo"/>
+                                <input type="hidden" name="imagenActual" id="imagenActual" value="<%=imagen%>">
+                            </div>
+                            <div class="col-6">
+                                <label for="txt_imagen" class="btn btnUpdateImg">Actualizar Imagen <i class="bi bi-upload"></i></label>
+                                <input type="file" id="txt_imagen" name="txt_imagen" class="d-none" />
+                            </div>
                         </div>
                     </div>
-<!--                    <div class="row">
-                        <div class="col-6">
-                            <button type="file" id="txt_imagen" name="txt_imagen" class="btn btnUpdateImg">Actualizar Imagen <i class="bi bi-upload"></i>
-                            </button>
-                        </div>
-                        <div class="col-12 mb-3">
-                             <input class="form-control" name="txt_imagen" id="txt_imagen" type="text" value="<%=imagen%>">
-                        </div>
-                    </div>-->
                 </div>
-            </div>
-            <div class="d-flex justify-content-start">
-                <div class="col-4 text-end">
-                    <p class="font">Descripción:</p>
+                <div class="d-flex justify-content-start">
+                    <div class="col-4 text-end">
+                        <p class="font">Descripción:</p>
+                    </div>
+                    <div class="col-4 ms-2">
+                        <textarea class="form-control" rows="3" name="txt_descripcion" id="txt_descripcion"><%=descripcion%></textarea>
+                    </div>
                 </div>
-                <div class="col-4 ms-2">
-                    <textarea class="form-control" rows="3" name="txt_descripcion" id="txt_descripcion"><%=descripcion%></textarea>
+                <div class="d-flex justify-content-start mt-3">
+                    <div class="col-4 text-end">
+                        <p class="font">Precio unitario:</p>
+                    </div>
+                    <div class="col-4 ms-2">
+                        <input class="form-control" type="number" value="<%=precio_unitario%>" name="txt_precio_unitario" id="txt_precio_unitario">
+                    </div>
                 </div>
-            </div>
-            <div class="d-flex justify-content-start mt-3">
-                <div class="col-4 text-end">
-                    <p class="font">Precio unitario:</p>
-                </div>
-                <div class="col-4 ms-2">
-                    <input class="form-control" type="number" value="<%=precio_unitario%>" name="txt_precio_unitario" id="txt_precio_unitario">
-                </div>
-            </div>
-            <div class="d-flex justify-content-start">
-                <div class="col-4 text-end">
-                    <p class="font">Categoria:</p>
-                </div>
-                <div class="col-4 ms-2">
-                    <select class="form-select" name="txt_categoria_id" id="txt_categoria_id">
-                        <%
-                            ArrayList<CategoriaModel> listaCategorias = (ArrayList<CategoriaModel>) request.getAttribute("categorias");
+                <div class="d-flex justify-content-start">
+                    <div class="col-4 text-end">
+                        <p class="font">Categoria:</p>
+                    </div>
+                    <div class="col-4 ms-2">
+                        <select class="form-select" name="txt_categoria_id" id="txt_categoria_id">
+                            <%
+                                ArrayList<CategoriaModel> listaCategorias = (ArrayList<CategoriaModel>) request.getAttribute("categorias");
 
-                            if (listaCategorias != null && !listaCategorias.isEmpty()) {
-                                for (CategoriaModel categoria : listaCategorias) {
-                        %>
-                        <option value="<%= categoria.getId()%>" <%= categoria_id == categoria.getId() ? "selected" : ""%>>
-                            <%= categoria.getNombre()%>
-                        </option>
+                                if (listaCategorias != null && !listaCategorias.isEmpty()) {
+                                    for (CategoriaModel categoria : listaCategorias) {
+                            %>
+                            <option value="<%= categoria.getId()%>" <%= categoria_id == categoria.getId() ? "selected" : ""%>>
+                                <%= categoria.getNombre()%>
+                            </option>
 
-                        <%
-                            }
-                        } else {
-                        %>
-                        <tr>
-                            <td colspan="7">No hay categorias registrados.</td>
-                        </tr>
-                        <%
-                            }
-                        %>
-                    </select>
+                            <%
+                                }
+                            } else {
+                            %>
+                            <tr>
+                                <td colspan="7">No hay categorias registrados.</td>
+                            </tr>
+                            <%
+                                }
+                            %>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="d-flex justify-content-start">
-                <div class="col-4 text-end">
-                    <p class="font">Disponibilidad:</p>
+                <div class="d-flex justify-content-start">
+                    <div class="col-4 text-end">
+                        <p class="font">Disponibilidad:</p>
+                    </div>
+                    <div class="col-4 ms-2">
+                        <select class="form-select" name="txt_disponibilidad" id="txt_disponibilidad" required>
+                            <option selected value="1">Activo</option>
+                            <option value="2">Inactivo</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-4 ms-2">
-                    <select class="form-select" name="txt_disponibilidad" id="txt_disponibilidad">
-                        <option selected>Activo</option>
-                        <option value="1">Inactivo</option>
-                    </select>
+                <div class="row">
+                    <div class="col-md-5 offset-md-4">
+                        <button type="button" onclick="actualizarPlatillo(<%=id%>)" class="btn btnUpdate">Actualizar</button>
+                        <button type="button" class="btn btnDelete" onclick="eliminarPlatillo(<%=id%>)">
+                            Eliminar
+                        </button>
+                    </div>
                 </div>
-            </div>
-<!--            <div class="d-flex justify-content-start">
-                <div class="col-4 text-end">
-                    <p class="font">Fecha de creación:</p>
-                </div>
-                <div class="col-4 ms-2">
-                    <input class="form-control calendare" type="date" value="2024-11-04" disabled>
-                </div>
-            </div>-->
-            <div class="row">
-                <div class="col-md-5 offset-md-4">
-                    <button onclick="actualizarPlatillo()" name="accion" type="button" class="btn btnUpdate">Actualizar</button>
-                    <button type="button" class="btn btnDelete" onclick="eliminarPlatillo(${platillo.id})">
-                        Eliminar
-                    </button>
+            </form>
+            <!-- Modal de Éxito -->
+            <div id="successModal" class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Éxito</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p>¡Platillo actualizado con éxito!</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
         <script>
             // Función para abrir/cerrar el sidebar
             function toggleSidebar() {
                 document.getElementById("mySidebar").classList.toggle("open");
             }
             
-            function actualizarPlatillo() {
-                const id = "<%= id %>";
+            function actualizarPlatillo(id) {
+                var datos;
                 const nombre = document.getElementById("txt_nombre").value;
-                const imagen = document.getElementById("txt_imagen").value;
+                const imagenActual = document.getElementById("imagenActual").value;
+                var imagen = document.getElementById("txt_imagen").value;
                 const descripcion = document.getElementById("txt_descripcion").value;
                 const precio_unitario = document.getElementById("txt_precio_unitario").value;
                 const categoria_id = document.getElementById("txt_categoria_id").value;
                 const disponibilidad = document.getElementById("txt_disponibilidad").value;
-
-                const datos = {
-                    nombre: nombre,
-                    imagen: imagen,
-                    descripcion: descripcion,
-                    precio_unitario: precio_unitario,
-                    categoria_id: categoria_id,
-                    disponibilidad: disponibilidad,
-                    id: id
-                };
-
-                fetch("pages/admin/editDish", {
+               
+                if (imagen.length > 0) {
+                    const fileName = imagen.split("\\").pop();  
+                    imagen = `/foodflow/images/`+fileName;
+                }
+    
+                if (imagen.length === 0){
+                    datos = {
+                      nombre: nombre,
+                      imagen: imagenActual,
+                      descripcion: descripcion,
+                      precio_unitario: precio_unitario,
+                      categoria_id: categoria_id,
+                      disponibilidad: disponibilidad,
+                      id: id
+                    };  
+                    console.log(imagenActual);
+                } else {
+                    datos = {
+                      nombre: nombre,
+                      imagen: imagen,
+                      descripcion: descripcion,
+                      precio_unitario: precio_unitario,
+                      categoria_id: categoria_id,
+                      disponibilidad: disponibilidad,
+                      id: id
+                    };
+                    console.log(imagen);
+                }
+                fetch(`editDish?id=` + id , {
                     method: "PUT",
                     body: JSON.stringify(datos),
                     headers: {
@@ -267,22 +294,22 @@
                 .then(response => response.text())
                 .then(data => {
                     alert("Platillo actualizado")
-                    location.reload();
+                    //location.reload();
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
             }
 
-            function eliminarPlatillo() {
-                const id = "<%= id %>";
-                if (confirm(`¿Estás seguro de que quieres eliminar este platillo?`+id)) {
-                    fetch(`platillo?id=` + id, {
+            function eliminarPlatillo(id) {
+                console.log(`eliminarPlatillo?id=` + id);
+                if (confirm("¿Estás seguro de que quieres eliminar este platillo?")) {
+                    fetch(`editDish?id=` + id, {
                         method: 'DELETE'
                     }).then(response => {
                         if (response.ok) {
                             alert('Platillo eliminado exitosamente');
-                            location.reload();
+                             window.location.href = "<%= request.getContextPath() %>/platillos";
                         } else {
                             alert('Error al eliminar el platillo');
                         }

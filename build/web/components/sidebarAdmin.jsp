@@ -86,23 +86,23 @@
             
             <!-- Opciones del sidebar -->
             <div class="sidebar-option">
-                <img src="../../assets/icons/search.png" class="logo" alt="LOGO">
+                <img src="./assets/icons/search.png" class="logo" alt="LOGO">
                 <span class="option-text">Buscar</span>
             </div>
             <div class="sidebar-option">
-                <img src="../../assets/icons/user.png" alt="Opción 2">
+                <img src="./assets/icons/user.png" alt="Opción 2">
                 <span class="option-text">Usuarios</span>
             </div>
             <div class="sidebar-option">
-                <img src="../../assets/icons/platillos.png" alt="Opción 3">
+                <img src="./assets/icons/platillos.png" alt="Opción 3">
                 <span class="option-text">Platillos</span>
             </div>
             <div class="sidebar-option">
-                <img src="../../assets/icons/ventas.png" alt="Opción 4">
+                <img src="./assets/icons/ventas.png" alt="Opción 4">
                 <span class="option-text">Ventas</span>
             </div>
             <div class="sidebar-option">
-                <img src="../../assets/icons/fidelidad.png" alt="Opción 5">
+                <img src="./assets/icons/fidelidad.png" alt="Opción 5">
                 <span class="option-text">Fidelidad</span>
             </div>
         </div>

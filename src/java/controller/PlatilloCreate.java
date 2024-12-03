@@ -21,65 +21,41 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import static jdk.nashorn.internal.objects.NativeString.substring;
 import model.CategoriaModel;
 import model.PlatilloModel;
 
-@WebServlet("/pages/admin/createDish")
+@WebServlet("/createDish")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10, // 10MB
+        maxRequestSize = 1024 * 1024 * 50)
 public class PlatilloCreate extends HttpServlet {
+    private static final String UPLOAD_DIR = "images";
     private static final long serialVersionUID = 1L;
-
     Connection conn;
     PreparedStatement ps;
     Statement statement;
     ResultSet rs;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet PlatilloCreate</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet PlatilloCreate at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
-        
+
         List<CategoriaModel> listaCategorias = new ArrayList<>();
         String categoriaId = request.getParameter("categoriaId");
         String sqlCategories = "SELECT id, nombre FROM categorias_platillos";
@@ -100,52 +76,63 @@ public class PlatilloCreate extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al obtener las categorias: " + e.getMessage());
         }
     }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     
+    private String getFileName(Part part){
+        String contentDisposition = part.getHeader("content-disposition");
+        for(String token: contentDisposition.split(";")){
+            if(token.trim().startsWith("filename")){
+                return token.substring(token.indexOf('=')+2, token.length()-1);
+            }
+        }
+        return "";
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
         ConnectionBD conexion = new ConnectionBD();
+   
+        String applicationPath = request.getServletContext().getRealPath("");
+        String uploadFilePath = applicationPath + File.separator + "web" + File.separator + "images"; 
+    
+        File uploadDir = new File(uploadFilePath);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
         
+        Part part = request.getPart("txt_imagen");
+        String fileName = getFileName(part);
+        String filePath = uploadFilePath + File.separator + fileName;
+        part.write(filePath);
+        String imageUrl = "/foodflow/images/" + fileName;
+
         String nombre = URLDecoder.decode(request.getParameter("txt_nombre"), "UTF-8");
-        String imagen = URLDecoder.decode(request.getParameter("txt_imagen"), "UTF-8");
         String descripcion = URLDecoder.decode(request.getParameter("txt_descripcion"), "UTF-8");
         String precio_unitario = URLDecoder.decode(request.getParameter("txt_precio_unitario"), "UTF-8");
         String categoria_id = URLDecoder.decode(request.getParameter("txt_categoria_id"), "UTF-8");
         String disponibilidad = URLDecoder.decode(request.getParameter("txt_disponibilidad"), "UTF-8");
 
         double precioFinal = 0.0;
-        precioFinal = Double.parseDouble(precio_unitario); 
+        precioFinal = Double.parseDouble(precio_unitario);
         int categoriaFinal = 0;
-        categoriaFinal = Integer.parseInt(categoria_id); 
+        categoriaFinal = Integer.parseInt(categoria_id);
         boolean disponibilidadFinal = true;
-        disponibilidadFinal = Boolean.parseBoolean(disponibilidad);
-   
-        System.out.printf("Nombre: %s\n", nombre);
-        System.out.printf("Imagen: %s\n", imagen);
-        System.out.printf("Descripción: %s\n", descripcion);
-        System.out.printf("Precio final: %.2f\n", precioFinal);
-        System.out.printf("Categoría ID: %d\n", categoriaFinal);
-        System.out.printf("Disponibilidad: %b\n", disponibilidadFinal);
-
-
+        if ("1".equals(disponibilidad)) {
+            disponibilidadFinal = true;
+        } else if ("2".equals(disponibilidad)) {
+            disponibilidadFinal = false;
+        }
+        
         try {
             String sql = "INSERT INTO platillos (nombre, imagen, descripcion, "
-                    + "precio_unitario, categoria_id, disponibilidad) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    + "precio_unitario, categoria_id, disponibilidad) VALUES (?, ?, ?, ?, ?, ?)";
+
             conn = conexion.getConnectionBD();
             ps = conn.prepareStatement(sql);
             ps.setString(1, nombre);
-            ps.setString(2, imagen);
+            ps.setString(2, imageUrl);
             ps.setString(3, descripcion);
             ps.setDouble(4, precioFinal);
             ps.setInt(5, categoriaFinal);
@@ -153,13 +140,15 @@ public class PlatilloCreate extends HttpServlet {
 
             int filasInsertadas = ps.executeUpdate();
             if (filasInsertadas > 0) {
-                request.getRequestDispatcher("/pages/admin/viewDish").forward(request, response);
+                request.setAttribute("success", true);
+                request.getRequestDispatcher("/pages/admin/createDish.jsp").forward(request, response);
             } else {
-                request.getRequestDispatcher("/pages/admin/viewDish").forward(request, response);
+                request.setAttribute("errorMessage", "Error al crear el platillo.");
+                request.getRequestDispatcher("/pages/admin/createDish.jsp").forward(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.getRequestDispatcher("/pages/admin/viewDish").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/pages/admin/createDish.jsp");
         } finally {
             try {
                 if (rs != null) {

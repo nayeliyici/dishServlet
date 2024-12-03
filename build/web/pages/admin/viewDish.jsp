@@ -45,7 +45,7 @@
             .dropdown-item {
                 color: #000 !important;
             }
-            
+
             .btn-light {
                 margin: 0px !important;
                 padding-top: 0px !important;
@@ -75,13 +75,13 @@
                             Tipo
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Platillos</a></li>
-                            <li><a class="dropdown-item" href="#">Bebidas</a></li>
+                            <li><a class="dropdown-item" href="${pageContext.request.contextPath}/platillos">Platillos</a></li>
+                            <li><a class="dropdown-item" href="${pageContext.request.contextPath}/bebida">Bebidas</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-3">
-                    <h4>Bienvenido: Juan</h4>
+                    <h4>Bienvenido</h4>
                 </div>
             </div>
             <div class="fieldset">
@@ -90,19 +90,19 @@
                         <h5>Platillos</h5>
                     </div>
                     <div class="col-2">
-                        <form method="GET" action="/foodflow/pages/admin/viewDish">
+                        <form method="GET" action="/foodflow/platillos">
                             <div class="dropdown">
                                 <button class="btn dropdown-toggle drop" type="button" data-bs-toggle="dropdown">
                                     Categoría
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="?categoriaId=">Todos</a></li>
-                                    <%
-                                        ArrayList<CategoriaModel> listaCategorias = (ArrayList<CategoriaModel>) request.getAttribute("categorias");
+                                        <%
+                                            ArrayList<CategoriaModel> listaCategorias = (ArrayList<CategoriaModel>) request.getAttribute("categorias");
 
-                                        if (listaCategorias != null && !listaCategorias.isEmpty()) {
-                                            for (CategoriaModel categoria : listaCategorias) {
-                                    %>
+                                            if (listaCategorias != null && !listaCategorias.isEmpty()) {
+                                                for (CategoriaModel categoria : listaCategorias) {
+                                        %>
                                     <li>
                                         <button class="dropdown-item" name="categoriaId" value="<%= categoria.getId()%>" type="submit">
                                             <%= categoria.getNombre()%>
@@ -119,10 +119,10 @@
                                 </ul>
                             </div>
                         </form>
-                    </div>
 
+                    </div>
                     <div class="col-2">
-                        <a href="createDish"><button type="button" class="btn btnAdd w-100">Agregar</button></a>
+                        <button type="button" class="btn btnAdd w-100" onclick="window.location.href = '/foodflow/createDish'">Agregar</button>
                     </div>
                 </div>
                 <div class="row mt-4">
@@ -153,11 +153,8 @@
                                 <td><%= platillo.getCategoriaNombre()%></td>
                                 <td><%= platillo.getDisponibilidad() ? "Activo" : "Inactivo"%></td>
                                 <td>
-                                    <form action="/foodflow/pages/admin/editDish" method="GET"> 
-                                        <input type="hidden" name="id" value="<%= platillo.getId()%>"> 
-                                        <button type="submit" class="btn btn-light">Actualizar</button>
-                                    </form>
-                                </td>
+                                    <button class="btn btn-light" onclick="window.location.href = '/foodflow/editDish?id=<%= platillo.getId()%>'">Actualizar</button>
+                                </td> 
                             </tr>
                             <%
                                 }

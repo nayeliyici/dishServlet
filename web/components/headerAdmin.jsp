@@ -43,7 +43,7 @@
             <nav class="navbar navbar-expand-sm navbar-white bg-white">
                 <div class="container d-flex justify-content-center">
                     <a class="navbar-brand" href="#">
-                        <img src="../../assets/FoodFlow Logo.png" class="logo" alt="LOGO">
+                        <img src="./assets/FoodFlow Logo.png" class="logo" alt="LOGO">
                     </a>
                 </div>
             </nav>
